@@ -22,6 +22,8 @@ protected:
     bool on_toggle_goodbye_timeout();
     void update_goodbye();
 
+    void on_rate_changed();
+
     bool on_canvas_expose(GdkEventExpose* event);
     void update_canvas();
     void update_canvas(Cairo::RefPtr<Cairo::Context> &context);
@@ -35,7 +37,9 @@ protected:
     Gtk::HBox box_h;
     Gtk::DrawingArea ara_canvas;
     Gtk::Allocation alc_allocation;
+    Gtk::HScale scl_rate;
     double level;
+    double rate;
 };
 
 #endif // GTKMM_EXAMPLE_HELLOWORLD_H

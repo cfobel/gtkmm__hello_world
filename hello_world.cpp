@@ -7,8 +7,11 @@ HelloWorld::HelloWorld()
         : btn_hello("Hello World"), btn_goodbye("Goodbye World"),
             tgl_hello("Hello World (run)"),
             tgl_goodbye("Goodbye World (run)"),
+            scl_rate(50, 2000, 50),
+            rate(500),
             level(0.8) {
-    set_size_request(400, 400);
+    scl_rate.set_value(rate);
+    set_size_request(600, 600);
     // Sets the border width of the window.
     set_border_width(10);
 
@@ -22,6 +25,8 @@ HelloWorld::HelloWorld()
                 &HelloWorld::on_goodbye_clicked));
     tgl_goodbye.signal_clicked().connect(sigc::mem_fun(*this,
                 &HelloWorld::on_toggle_goodbye_clicked));
+    scl_rate.signal_value_changed().connect(sigc::mem_fun(*this,
+                &HelloWorld::on_rate_changed));
     ara_canvas.signal_expose_event().connect(
         sigc::mem_fun(*this, &HelloWorld::on_canvas_expose));
 
@@ -30,12 +35,20 @@ HelloWorld::HelloWorld()
     box_h.pack_start(btn_goodbye, false, false);
     box_h.pack_start(tgl_hello, false, false);
     box_h.pack_start(tgl_goodbye, false, false);
+    box_h.pack_start(scl_rate, true, true);
+
     box_v.pack_start(ara_canvas);
     add(box_v);
     show_all_children();
 }
 
 HelloWorld::~HelloWorld() {}
+
+
+void HelloWorld::on_rate_changed() {
+    rate = scl_rate.get_value();
+}
+
 
 void HelloWorld::on_hello_clicked() {
     update_hello();
@@ -47,7 +60,7 @@ bool HelloWorld::on_toggle_hello_timeout() {
         update_hello();
         Glib::signal_timeout().connect(
                 sigc::mem_fun(*this, &HelloWorld::on_toggle_hello_timeout),
-                500);
+                rate);
     }
 }
 
@@ -70,7 +83,7 @@ bool HelloWorld::on_toggle_goodbye_timeout() {
         update_goodbye();
         Glib::signal_timeout().connect(
                 sigc::mem_fun(*this, &HelloWorld::on_toggle_goodbye_timeout),
-                500);
+                rate);
     }
 }
 
