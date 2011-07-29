@@ -13,6 +13,9 @@ public:
 protected:
     //Signal handlers:
     void on_hello_button_clicked();
+    void on_toggle_hello_clicked();
+    bool on_toggle_hello_timeout();
+    void update_hello();
     void on_goodbye_button_clicked();
     bool on_area_expose(GdkEventExpose* event);
     void update_drawing();
@@ -20,6 +23,7 @@ protected:
     //Member widgets:
     Gtk::Button hello_button;
     Gtk::Button goodbye_button;
+    Gtk::ToggleButton tgl_hello;
     Gtk::VBox vbox;
     Gtk::HBox hbox;
     Gtk::DrawingArea area;

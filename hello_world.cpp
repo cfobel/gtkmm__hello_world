@@ -5,6 +5,7 @@ using namespace std;
 HelloWorld::HelloWorld()
         // creates a new button with label "Hello World".  
         : hello_button("Hello World"), goodbye_button("Goodbye World"),
+            tgl_hello("Hello World (run)"),
             level(0.8) {
     set_size_request(400, 400);
     // Sets the border width of the window.
@@ -14,6 +15,8 @@ HelloWorld::HelloWorld()
     // on_button_clicked() method defined below.
     hello_button.signal_clicked().connect(sigc::mem_fun(*this,
                 &HelloWorld::on_hello_button_clicked));
+    tgl_hello.signal_clicked().connect(sigc::mem_fun(*this,
+                &HelloWorld::on_toggle_hello_clicked));
     goodbye_button.signal_clicked().connect(sigc::mem_fun(*this,
                 &HelloWorld::on_goodbye_button_clicked));
     area.signal_expose_event().connect(
@@ -22,6 +25,7 @@ HelloWorld::HelloWorld()
     vbox.pack_start(hbox, false, false);
     hbox.pack_start(hello_button, false, false);
     hbox.pack_start(goodbye_button, false, false);
+    hbox.pack_start(tgl_hello, false, false);
     vbox.pack_start(area);
     add(vbox);
     show_all_children();
@@ -30,6 +34,25 @@ HelloWorld::HelloWorld()
 HelloWorld::~HelloWorld() {}
 
 void HelloWorld::on_hello_button_clicked() {
+    update_hello();
+}
+
+
+bool HelloWorld::on_toggle_hello_timeout() {
+    if(tgl_hello.get_active()) {
+        update_hello();
+        Glib::signal_timeout().connect(
+                sigc::mem_fun(*this, &HelloWorld::on_toggle_hello_timeout),
+                500);
+    }
+}
+
+void HelloWorld::on_toggle_hello_clicked() {
+    on_toggle_hello_timeout();
+}
+
+
+void HelloWorld::update_hello() {
     std::cout << "Hello World" << std::endl;
     level /= 0.9;
     update_drawing();
