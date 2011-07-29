@@ -4,8 +4,9 @@ using namespace std;
 
 HelloWorld::HelloWorld()
         // creates a new button with label "Hello World".  
-        : hello_button("Hello World"), goodbye_button("Goodbye World"),
+        : btn_hello("Hello World"), btn_goodbye("Goodbye World"),
             tgl_hello("Hello World (run)"),
+            tgl_goodbye("Goodbye World (run)"),
             level(0.8) {
     set_size_request(400, 400);
     // Sets the border width of the window.
@@ -13,27 +14,30 @@ HelloWorld::HelloWorld()
 
     // When the button receives the "clicked" signal, it will call the
     // on_button_clicked() method defined below.
-    hello_button.signal_clicked().connect(sigc::mem_fun(*this,
-                &HelloWorld::on_hello_button_clicked));
+    btn_hello.signal_clicked().connect(sigc::mem_fun(*this,
+                &HelloWorld::on_hello_clicked));
     tgl_hello.signal_clicked().connect(sigc::mem_fun(*this,
                 &HelloWorld::on_toggle_hello_clicked));
-    goodbye_button.signal_clicked().connect(sigc::mem_fun(*this,
-                &HelloWorld::on_goodbye_button_clicked));
-    area.signal_expose_event().connect(
-        sigc::mem_fun(*this, &HelloWorld::on_area_expose));
+    btn_goodbye.signal_clicked().connect(sigc::mem_fun(*this,
+                &HelloWorld::on_goodbye_clicked));
+    tgl_goodbye.signal_clicked().connect(sigc::mem_fun(*this,
+                &HelloWorld::on_toggle_goodbye_clicked));
+    ara_canvas.signal_expose_event().connect(
+        sigc::mem_fun(*this, &HelloWorld::on_canvas_expose));
 
-    vbox.pack_start(hbox, false, false);
-    hbox.pack_start(hello_button, false, false);
-    hbox.pack_start(goodbye_button, false, false);
-    hbox.pack_start(tgl_hello, false, false);
-    vbox.pack_start(area);
-    add(vbox);
+    box_v.pack_start(box_h, false, false);
+    box_h.pack_start(btn_hello, false, false);
+    box_h.pack_start(btn_goodbye, false, false);
+    box_h.pack_start(tgl_hello, false, false);
+    box_h.pack_start(tgl_goodbye, false, false);
+    box_v.pack_start(ara_canvas);
+    add(box_v);
     show_all_children();
 }
 
 HelloWorld::~HelloWorld() {}
 
-void HelloWorld::on_hello_button_clicked() {
+void HelloWorld::on_hello_clicked() {
     update_hello();
 }
 
@@ -47,7 +51,9 @@ bool HelloWorld::on_toggle_hello_timeout() {
     }
 }
 
+
 void HelloWorld::on_toggle_hello_clicked() {
+    tgl_goodbye.set_active(false);
     on_toggle_hello_timeout();
 }
 
@@ -55,26 +61,48 @@ void HelloWorld::on_toggle_hello_clicked() {
 void HelloWorld::update_hello() {
     std::cout << "Hello World" << std::endl;
     level /= 0.9;
-    update_drawing();
+    update_canvas();
 }
 
-void HelloWorld::on_goodbye_button_clicked() {
+
+bool HelloWorld::on_toggle_goodbye_timeout() {
+    if(tgl_goodbye.get_active()) {
+        update_goodbye();
+        Glib::signal_timeout().connect(
+                sigc::mem_fun(*this, &HelloWorld::on_toggle_goodbye_timeout),
+                500);
+    }
+}
+
+
+void HelloWorld::on_toggle_goodbye_clicked() {
+    tgl_hello.set_active(false);
+    on_toggle_goodbye_timeout();
+}
+
+
+void HelloWorld::on_goodbye_clicked() {
+    update_goodbye();
+}
+
+
+void HelloWorld::update_goodbye() {
     std::cout << "Goodbye World" << std::endl;
     level *= 0.9;
-    update_drawing();
+    update_canvas();
 }
 
 
-bool HelloWorld::on_area_expose(GdkEventExpose* event) {
-    update_drawing();
+bool HelloWorld::on_canvas_expose(GdkEventExpose* event) {
+    update_canvas();
     return true;
 }
 
-void HelloWorld::update_drawing() {
-    allocation = area.get_allocation();
-    Cairo::RefPtr<Cairo::Context> context = area.get_window()->create_cairo_context();
-    int width = allocation.get_width();
-    int height = allocation.get_height();
+void HelloWorld::update_canvas() {
+    alc_allocation = ara_canvas.get_allocation();
+    Cairo::RefPtr<Cairo::Context> context = ara_canvas.get_window()->create_cairo_context();
+    int width = alc_allocation.get_width();
+    int height = alc_allocation.get_height();
     cout << "width: " << width << ", height: " << height << endl;
     context->save();
     context->set_source_rgba(0, level, 0, 1);
