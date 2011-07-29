@@ -94,13 +94,23 @@ void HelloWorld::update_goodbye() {
 
 
 bool HelloWorld::on_canvas_expose(GdkEventExpose* event) {
+    Cairo::RefPtr<Cairo::Context> context = ara_canvas.get_window()->create_cairo_context();
+    context->rectangle(event->area.x, event->area.y, event->area.width, 
+            event->area.height);
+    context->clip();
     update_canvas();
     return true;
 }
 
+
 void HelloWorld::update_canvas() {
-    alc_allocation = ara_canvas.get_allocation();
     Cairo::RefPtr<Cairo::Context> context = ara_canvas.get_window()->create_cairo_context();
+    update_canvas(context);
+}
+
+
+void HelloWorld::update_canvas(Cairo::RefPtr<Cairo::Context> &context) {
+    alc_allocation = ara_canvas.get_allocation();
     int width = alc_allocation.get_width();
     int height = alc_allocation.get_height();
     cout << "width: " << width << ", height: " << height << endl;

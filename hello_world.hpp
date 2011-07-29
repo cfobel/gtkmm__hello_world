@@ -24,6 +24,7 @@ protected:
 
     bool on_canvas_expose(GdkEventExpose* event);
     void update_canvas();
+    void update_canvas(Cairo::RefPtr<Cairo::Context> &context);
 
     //Member widgets:
     Gtk::Button btn_hello;
