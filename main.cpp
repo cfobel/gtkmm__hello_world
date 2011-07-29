@@ -1,4 +1,4 @@
-#include "helloworld.hpp"
+#include "hello_world.hpp"
 #include <gtkmm/main.h>
 
 int main (int argc, char *argv[])
